@@ -17,15 +17,13 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: true,
-    validate: {
-      validator: function (v) {
-        return /^(?=.*[\d])(?=.*[!@#$%^&`*])[\w!@#$%^&`*]{8,}$/.test(v);
-      },
-      message: (message) => "Your password does not follow the selected rules",
-    },
-    // minlength: 8,
-    // match: /^(?=.*[\d])(?=.*[!@#$%^&`*])[\w!@#$%^&`*]{8,}$/
+    minlength: 8,
   },
+  refreshTokens: [
+    {
+      type: String,
+    },
+  ],
 });
 
 userSchema.methods.comparePasswords = async function (loginPassword) {
@@ -64,6 +62,7 @@ userSchema.set("toJSON", {
   transform: function (_doc, ret, _opt) {
     delete ret.password;
     delete ret.__v;
+    delete ret.refreshTokens;
 
     return ret;
   },

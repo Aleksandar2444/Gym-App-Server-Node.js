@@ -26,6 +26,7 @@ export class AuthService {
       throw error;
     }
   }
+
   // 3. Validate refresh token
   static async validateRefreshToken(refreshToken) {
     try {
@@ -69,6 +70,17 @@ export class AuthService {
       user.refreshTokens = [];
 
       await user.save();
+    } catch (error) {
+      throw error;
+    }
+  }
+  // 7. Find user by id
+  static async findUserById(userId) {
+    try {
+      const user = await User.findById(userId);
+      if (!user) throw "User not found";
+
+      return user;
     } catch (error) {
       throw error;
     }

@@ -77,4 +77,15 @@ export class AuthController {
       res.status(400).send(error);
     }
   }
+  // 6. Find user by id
+  static async findUserById(req, res, next) {
+    try {
+      const userId = req.params.id;
+      const user = await AuthService.findUserById(userId);
+
+      res.status(200).send(user);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

@@ -8,7 +8,11 @@ export const authRouter = Router();
 authRouter.post("/register", AuthController.registerUser);
 // 2. Login user
 authRouter.post("/login", AuthController.loginUser);
+// Refresh token
+authRouter.post("/refresh-token", AuthController.refreshAccessToken);
 // 3. Logout user
 authRouter.post("/logout", authValidator, AuthController.logoutUser);
 // 4. Logout all
 authRouter.post("/logout-all", authValidator, AuthController.logoutAll);
+// 5. Find user by id
+authRouter.get("/user/:id", AuthController.findUserById);

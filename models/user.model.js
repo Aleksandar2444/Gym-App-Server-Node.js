@@ -63,6 +63,7 @@ userSchema.set("toJSON", {
     delete ret.password;
     delete ret.__v;
     delete ret.refreshTokens;
+    delete ret.token;
 
     return ret;
   },

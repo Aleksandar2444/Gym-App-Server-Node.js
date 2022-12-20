@@ -1,5 +1,5 @@
 import { User } from "../models/user.model.js";
-import { verifyRefreshToken } from "../const/jwt.const.js";
+import { verifyAccessToken } from "../const/jwt.const.js";
 
 export class AuthService {
   // 1. Register user
@@ -27,53 +27,20 @@ export class AuthService {
     }
   }
 
-  // 3. Validate refresh token
-  static async validateRefreshToken(refreshToken) {
+  // 3. Validate token
+  static async validateAccessToken(token) {
     try {
-      const { userId } = verifyRefreshToken(refreshToken);
+      const { userId } = verifyAccessToken(token);
       const foundUser = await User.findById(userId);
 
       if (!foundUser) throw new Error();
-      if (!foundUser.refreshTokens.find((token) => token === refreshToken))
-        throw new Error();
 
       return foundUser;
     } catch (error) {
       throw error;
     }
   }
-  // 4. Save refresh token
-  static async saveRefreshToken(user, refreshToken) {
-    try {
-      user.refreshTokens.push(refreshToken);
 
-      await user.save();
-    } catch (error) {
-      throw error;
-    }
-  }
-  // 5. Delete refresh token
-  static async deleteRefreshToken(user, refreshToken) {
-    try {
-      user.refreshTokens = user.refreshTokens.filter(
-        (token) => token !== refreshToken
-      );
-
-      await user.save();
-    } catch (error) {
-      throw error;
-    }
-  }
-  // 6. Delete all refresh tokens
-  static async deleteAllRefreshTokens(user) {
-    try {
-      user.refreshTokens = [];
-
-      await user.save();
-    } catch (error) {
-      throw error;
-    }
-  }
   // 7. Find user by id
   static async findUserById(userId) {
     try {

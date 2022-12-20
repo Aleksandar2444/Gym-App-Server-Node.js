@@ -1,5 +1,5 @@
 import { AuthService } from "../services/auth.service.js";
-import { createAccessToken, createRefreshToken } from "../const/jwt.const.js";
+import { createAccessToken } from "../const/jwt.const.js";
 
 export class AuthController {
   // 1. Register user
@@ -20,14 +20,10 @@ export class AuthController {
       const user = await AuthService.loginUser(email, password);
 
       const token = createAccessToken(user._id);
-      const refreshToken = createRefreshToken(user._id);
-
-      await AuthService.saveRefreshToken(user, refreshToken);
 
       res.status(200).send({
         ...user.toJSON(),
         token,
-        refreshToken,
         message: "Logged in successfully!",
       });
     } catch (error) {
@@ -35,19 +31,14 @@ export class AuthController {
     }
   }
   // 3. Refresh access token
-  static async refreshAccessToken(req, res) {
+  static async accessToken(req, res) {
     try {
-      const refreshToken = req.body.refreshToken;
-      const user = await AuthService.validateRefreshToken(refreshToken);
-
-      await AuthService.deleteRefreshToken(user, refreshToken);
+      const accessToken = req.body.token;
+      const user = await AuthService.validateAccessToken(accessToken);
 
       const token = createAccessToken(user._id);
-      const newRefreshToken = createRefreshToken(user._id);
 
-      await AuthService.saveRefreshToken(user, newRefreshToken);
-
-      return res.status(200).send({ token, newRefreshToken });
+      return res.status(200).send({ token });
     } catch (error) {
       res.sendStatus(403);
     }
@@ -56,21 +47,10 @@ export class AuthController {
   static async logoutUser(req, res) {
     try {
       const user = req.user;
-      const refreshToken = req.body.refreshToken;
+      const accessToken = req.body.token;
 
-      await AuthService.deleteRefreshToken(user, refreshToken);
-
-      res.sendStatus(204);
-    } catch (error) {
-      res.status(400).send(error);
-    }
-  }
-  // 5. Logout all
-  static async logoutAll(req, res) {
-    try {
-      const user = req.user;
-
-      await AuthService.deleteAllRefreshTokens(user);
+      user = null;
+      accessToken = null;
 
       res.sendStatus(204);
     } catch (error) {

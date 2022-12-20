@@ -5,6 +5,11 @@ import bcrypt from "bcryptjs";
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
+  userName: {
+    type: String,
+    required: true,
+    minlength: 4,
+  },
   email: {
     type: String,
     required: true,
@@ -19,11 +24,6 @@ const userSchema = new Schema({
     required: true,
     minlength: 8,
   },
-  refreshTokens: [
-    {
-      type: String,
-    },
-  ],
 });
 
 userSchema.methods.comparePasswords = async function (loginPassword) {
@@ -62,8 +62,6 @@ userSchema.set("toJSON", {
   transform: function (_doc, ret, _opt) {
     delete ret.password;
     delete ret.__v;
-    delete ret.refreshTokens;
-    delete ret.token;
 
     return ret;
   },

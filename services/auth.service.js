@@ -41,7 +41,7 @@ export class AuthService {
     }
   }
 
-  // 7. Find user by id
+  // 4. Find user by id
   static async findUserById(userId) {
     try {
       const user = await User.findById(userId);

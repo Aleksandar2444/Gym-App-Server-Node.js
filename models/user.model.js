@@ -9,6 +9,7 @@ const userSchema = new Schema({
     type: String,
     required: true,
     minlength: 4,
+    unique: true,
   },
   email: {
     type: String,
@@ -23,6 +24,10 @@ const userSchema = new Schema({
     type: String,
     required: true,
     minlength: 8,
+  },
+  token: {
+    type: String,
+    unique: true,
   },
 });
 
@@ -62,6 +67,7 @@ userSchema.set("toJSON", {
   transform: function (_doc, ret, _opt) {
     delete ret.password;
     delete ret.__v;
+    delete ret.token;
 
     return ret;
   },

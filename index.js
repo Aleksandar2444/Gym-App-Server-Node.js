@@ -15,7 +15,6 @@ const MONOG_URI = `mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_CLUSTER
 
 const app = express();
 
-app.set("view engine", "ejs");
 app.use(cors());
 app.use(helmet());
 app.use(express.json());

@@ -1,144 +1,163 @@
-import { AuthService } from "../services/auth.service.js";
+import { config } from "dotenv";
+config();
+import {
+  registerUserService,
+  loginUserService,
+  logoutUserService,
+  findUserByIdService,
+} from "../services/auth.service.js";
 import { createAccessToken } from "../const/jwt.const.js";
 import { User } from "../models/user.model.js";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
+import {
+  GAf_000005,
+  GAf_000006,
+  GAs_000001,
+  GAs_000002,
+  GAs_000003,
+} from "../errors/error.codes.js";
 
-export class AuthController {
-  // 1. Register user
-  static async registerUser(req, res) {
+const { GYM_USER, GYM_PASSWORD, DOMEN_URL } = process.env;
+
+// 1. Register user
+export const registerUser = async (req, res) => {
+  try {
+    const userData = req.body;
+
     try {
-      const userData = req.body;
-      await AuthService.registerUser(userData);
+      await registerUserService(userData);
 
-      res.status(201).send({ message: "Account created successfully!" });
+      res.status(201).send({ message: `${GAs_000001}` });
     } catch (error) {
       res.status(400).send(error);
     }
+  } catch (error) {
+    res.status(500).send(error);
   }
-  // 2. Login user
-  static async loginUser(req, res) {
+};
+// 2. Login user
+export const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
     try {
-      const { email, password } = req.body;
-      const user = await AuthService.loginUser(email, password);
+      const user = await loginUserService(email, password);
 
       const token = createAccessToken(user._id);
 
       res.status(200).send({
-        ...user.toJSON(),
-        token,
-        message: "Logged in successfully!",
+        user: user.toJSON(),
+        userLoggedInToken: token,
+        message: `${GAs_000002}`,
       });
     } catch (error) {
       res.status(401).send(error);
     }
+  } catch (error) {
+    res.status(500).send(error);
   }
-  // 3. Refresh access token
-  static async accessToken(req, res) {
+};
+// 3. Logout user
+export const logoutUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    if (!userId) return res.sendStatus(403);
+
     try {
-      const accessToken = req.body.token;
-      const user = await AuthService.validateAccessToken(accessToken);
+      await logoutUserService(userId);
 
-      const token = createAccessToken(user._id);
-
-      return res.status(200).send({ token });
-    } catch (error) {
-      res.sendStatus(403);
-    }
-  }
-  // 4. Logout user
-  static async logoutUser(req, res) {
-    try {
-      const user = req.user;
-      const accessToken = req.body.token;
-
-      if (user && accessToken) return null;
+      req.user = null;
 
       res.sendStatus(204);
     } catch (error) {
-      res.status(400).send(error);
+      res.sendStatus(403);
     }
+  } catch (error) {
+    res.status(500).send(error);
   }
-  // 5. Find user by id
-  static async findUserById(req, res, next) {
-    try {
-      const userId = req.params.id;
-      const user = await AuthService.findUserById(userId);
+};
+// 4. Find user by id
+export const findUserById = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
 
-      res.status(200).send(user);
-    } catch (error) {
-      next(error);
-    }
+    const user = await findUserByIdService(userId);
+
+    res.status(200).send(user);
+  } catch (error) {
+    next(error);
   }
-  // 6. Forgot password
-  static async forgotPassword(req, res) {
-    try {
-      const { email } = req.body;
-      const user = await User.findOne({ email });
-      //* samo 200 nemora da znae userot dali postoi takov email
-      if (!user) return res.sendStatus(200);
+};
+// 5. Forgot password
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.sendStatus(403);
 
-      const secretToken = uuidv4();
-      await User.updateOne({
-        token: secretToken,
-      });
+    const user = await User.findOne({ email: email });
+    if (!user) return res.sendStatus(400);
 
-      const link = `http://localhost:4200/auth/reset-password/${secretToken}`;
+    const resetPasswordToken = uuidv4();
 
-      //! nodemailer
-      let transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: "gymtrackermk@gmail.com",
-          pass: "ykivnbfkjvwiurko",
-        },
-      });
+    await User.updateOne(user, { resetPasswordToken: resetPasswordToken });
 
-      let mailOptions = {
-        from: "gymtrackermk@gmail.com",
-        to: "aleksandarichev@proton.me",
-        subject: "Password reset",
-        text:
-          "Click on the following link to reset your password \n\n" +
-          link +
-          "\n\n If this was not you, please skip this and your password will remains unchanged.",
-      };
+    const link = `${DOMEN_URL}/auth/reset-password/${resetPasswordToken}`;
 
-      transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log("Email sent:" + info.response);
-        }
-      });
+    //! nodemailer
+    let transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: `${GYM_USER}`,
+        pass: `${GYM_PASSWORD}`,
+      },
+    });
 
-      console.log(link);
+    let mailOptions = {
+      from: `${GYM_USER}`,
+      to: `${user.email}`,
+      subject: "Password reset",
+      text:
+        "Click on the following link to reset your password \n\n" +
+        link +
+        "\n\n If this was not you, please skip this and your password will remains unchanged.",
+    };
 
-      res.sendStatus(200);
-    } catch (error) {}
-  }
-  // 7. Change password
-  static async resetPassword(req, res) {
-    try {
-      const { password, token } = req.body;
-
-      if (!token) {
-        return res.json({ message: "Token is not valid" });
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Email sent:" + info.response);
       }
+    });
 
-      const hashedPassword = await bcrypt.hash(password.password, 8);
-
-      await User.updateOne({
-        password: hashedPassword,
-        token: null,
-      });
-
-      res.status(200).send({
-        message: "Password updated",
-      });
-    } catch (error) {
-      res.status(500).send({ message: "Something went wrong" });
-    }
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send({ message: `${GAf_000005}` });
   }
-}
+};
+// 6. Change password
+export const resetPassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (!password) return res.sendStatus(400);
+
+    const resetPasswordToken = req.params;
+    if (!resetPasswordToken) return res.sendStatus(404);
+
+    const user = await User.findOne(resetPasswordToken);
+
+    const hashedPassword = await bcrypt.hash(password.password, 8);
+
+    await User.updateOne(user, {
+      password: hashedPassword,
+      resetPasswordToken: null,
+    });
+
+    res.status(200).send({ message: `${GAs_000003}` });
+  } catch (error) {
+    res.status(500).send({ message: `${GAf_000006}` });
+  }
+};

@@ -45,7 +45,7 @@ userSchema.pre("save", async function (next) {
   if (user.isModified("password") || user.isNew) {
     const regex = new RegExp(/^(?=.*[\d])(?=.*[!@#$%^&`*])[\w!@#$%^&`*]{8,}$/);
     if (regex.test(user.password) === false) {
-      next(new Error(`${GAf_000002}`));
+      next(new Error(GAf_000002));
     }
 
     const hashedPassword = await bcrypt.hash(user.password, 8);
@@ -58,7 +58,7 @@ userSchema.pre("save", async function (next) {
 
 userSchema.post("save", (error, _doc, next) => {
   if (error.code === 11000) {
-    return next({ message: `${GAf_000001}` });
+    return next({ message: GAf_000001 });
   }
   return next();
 });

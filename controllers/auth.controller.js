@@ -5,12 +5,12 @@ import {
   loginUserService,
   logoutUserService,
   findUserByIdService,
+  nodemailerService,
 } from "../services/auth.service.js";
 import { createAccessToken } from "../const/jwt.const.js";
 import { User } from "../models/user.model.js";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcryptjs";
-import nodemailer from "nodemailer";
 import {
   GAf_000005,
   GAf_000006,
@@ -19,7 +19,7 @@ import {
   GAs_000003,
 } from "../errors/error.codes.js";
 
-const { GYM_USER, GYM_PASSWORD, DOMEN_URL } = process.env;
+const { DOMAIN_URL } = process.env;
 
 // 1. Register user
 export const registerUser = async (req, res) => {
@@ -29,7 +29,7 @@ export const registerUser = async (req, res) => {
     try {
       await registerUserService(userData);
 
-      res.status(201).send({ message: `${GAs_000001}` });
+      res.status(201).send({ message: GAs_000001 });
     } catch (error) {
       res.status(400).send(error);
     }
@@ -50,7 +50,7 @@ export const loginUser = async (req, res) => {
       res.status(200).send({
         user: user.toJSON(),
         userLoggedInToken: token,
-        message: `${GAs_000002}`,
+        message: GAs_000002,
       });
     } catch (error) {
       res.status(401).send(error);
@@ -97,45 +97,21 @@ export const forgotPassword = async (req, res) => {
     const { email } = req.body;
     if (!email) return res.sendStatus(403);
 
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email: email.email });
     if (!user) return res.sendStatus(400);
 
     const resetPasswordToken = uuidv4();
 
     await User.updateOne(user, { resetPasswordToken: resetPasswordToken });
 
-    const link = `${DOMEN_URL}/auth/reset-password/${resetPasswordToken}`;
+    const link = `${DOMAIN_URL}/auth/reset-password/${resetPasswordToken}`;
 
-    //! nodemailer
-    let transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: `${GYM_USER}`,
-        pass: `${GYM_PASSWORD}`,
-      },
-    });
-
-    let mailOptions = {
-      from: `${GYM_USER}`,
-      to: `${user.email}`,
-      subject: "Password reset",
-      text:
-        "Click on the following link to reset your password \n\n" +
-        link +
-        "\n\n If this was not you, please skip this and your password will remains unchanged.",
-    };
-
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log("Email sent:" + info.response);
-      }
-    });
+    await nodemailerService(user, link);
 
     res.sendStatus(200);
   } catch (error) {
-    res.status(500).send({ message: `${GAf_000005}` });
+    console.log(error);
+    res.status(500).send({ message: GAf_000005 });
   }
 };
 // 6. Change password
@@ -156,8 +132,8 @@ export const resetPassword = async (req, res) => {
       resetPasswordToken: null,
     });
 
-    res.status(200).send({ message: `${GAs_000003}` });
+    res.status(200).send({ message: GAs_000003 });
   } catch (error) {
-    res.status(500).send({ message: `${GAf_000006}` });
+    res.status(500).send({ message: GAf_000006 });
   }
 };

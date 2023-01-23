@@ -1,7 +1,7 @@
 // Successful messages
 export const GAs_000001 = "Account created successfully!";
 export const GAs_000002 = "Logged in successfully!";
-export const GAs_000003 = "Password updated";
+export const GAs_000003 = "Password updated successfully!";
 
 // Failed messages
 export const GAf_000001 = "Email already exists";

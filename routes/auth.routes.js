@@ -18,7 +18,7 @@ authRouter.post("/login", loginUser);
 // 3. Logout user
 authRouter.post("/logout/:id", authValidator, logoutUser);
 // 5. Find user by id
-authRouter.get("/user/:id", findUserById);
+authRouter.get("/user/:id", authValidator, findUserById);
 // 6. Forgot password
 authRouter.post("/forgot-password", forgotPassword);
 // 7. Reset password

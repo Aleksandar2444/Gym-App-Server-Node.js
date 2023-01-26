@@ -47,7 +47,9 @@ export const loginUser = async (req, res) => {
 
       const token = createAccessToken(user._id);
 
-      res.status(200).send({
+      res.header("Authorization", `Bearer  ${token}`);
+
+      return res.status(200).send({
         user: user.toJSON(),
         userLoggedInToken: token,
         message: GAs_000002,
@@ -110,7 +112,6 @@ export const forgotPassword = async (req, res) => {
 
     res.sendStatus(200);
   } catch (error) {
-    console.log(error);
     res.status(500).send({ message: GAf_000005 });
   }
 };

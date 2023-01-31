@@ -99,7 +99,7 @@ export const forgotPassword = async (req, res) => {
     const { email } = req.body;
     if (!email) return res.sendStatus(403);
 
-    const user = await User.findOne({ email: email.email });
+    const user = await User.findOne({ email: email });
     if (!user) return res.sendStatus(400);
 
     const resetPasswordToken = uuidv4();
@@ -126,7 +126,7 @@ export const resetPassword = async (req, res) => {
 
     const user = await User.findOne(resetPasswordToken);
 
-    const hashedPassword = await bcrypt.hash(password.password, 8);
+    const hashedPassword = await bcrypt.hash(password, 8);
 
     await User.updateOne(user, {
       password: hashedPassword,
@@ -135,6 +135,7 @@ export const resetPassword = async (req, res) => {
 
     res.status(200).send({ message: GAs_000003 });
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: GAf_000006 });
   }
 };

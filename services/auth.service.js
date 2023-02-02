@@ -58,20 +58,22 @@ export const nodemailerService = async (user, link) => {
   try {
     let transporter = nodemailer.createTransport({
       service: "gmail",
+      secure: false,
       auth: {
         user: `${GYM_USER}`,
         pass: `${GYM_PASSWORD}`,
       },
+      from: `${GYM_USER}`,
     });
 
     let mailOptions = {
       from: `${GYM_USER}`,
       to: `${user.email}`,
       subject: "Password reset",
-      text:
-        "Click on the following link to reset your password \n\n" +
-        link +
-        "\n\n If this was not you, please skip this and your password will remains unchanged.",
+      text: `Hello dear ${user.userName}. \n
+            Click on the following link to reset your password. \n
+            ${link} \n
+            If this was not you, please skip this message and your password will remains unchanged.`,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {

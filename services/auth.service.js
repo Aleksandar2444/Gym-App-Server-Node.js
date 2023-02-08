@@ -70,7 +70,7 @@ export const nodemailerService = async (user, link) => {
       from: `${GYM_USER}`,
       to: `${user.email}`,
       subject: "Password reset",
-      text: `Hello dear ${user.userName}. \n
+      text: `Hello dear ${user.firstName}. \n
             Click on the following link to reset your password. \n
             ${link} \n
             If this was not you, please skip this message and your password will remains unchanged.`,

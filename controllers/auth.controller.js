@@ -135,7 +135,6 @@ export const resetPassword = async (req, res) => {
 
     res.status(200).send({ message: GAs_000003 });
   } catch (error) {
-    console.log(error);
     res.status(500).send({ message: GAf_000006 });
   }
 };

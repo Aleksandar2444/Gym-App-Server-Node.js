@@ -6,11 +6,15 @@ import { GAf_000001, GAf_000002 } from "../errors/error.codes.js";
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
-  userName: {
+  firstName: {
     type: String,
     required: true,
-    minlength: 4,
-    unique: true,
+    minlength: 2,
+  },
+  lastName: {
+    type: String,
+    required: true,
+    minlength: 2,
   },
   email: {
     type: String,

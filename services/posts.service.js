@@ -1,4 +1,12 @@
 import { BadRequest, GeneralError, NotFound } from "../errors/error.js";
+import {
+  GAf_000009,
+  GAf_000010,
+  GAf_000011,
+  GAf_000012,
+  GAf_000013,
+  GAf_000014,
+} from "../errors/error.codes.js";
 import { Post } from "../models/post.model.js";
 
 // 1. Get all posts
@@ -12,7 +20,7 @@ export const getAllPostsService = async () => {
 
     return posts;
   } catch (error) {
-    throw new GeneralError(`Couldn't fetch posts, ERROR: ${error}`);
+    throw new GeneralError(GAf_000009, `ERROR: ${error}`);
   }
 };
 // 2. Get post by id
@@ -28,11 +36,11 @@ export const getPostByIdService = async (postId) => {
         },
       });
 
-    if (!findPost) throw "Post not found";
+    if (!findPost) throw GAf_000010;
 
     return findPost;
   } catch (error) {
-    throw new NotFound(`Couldn't fetch post, ERROR: ${error}`);
+    throw new NotFound(GAf_000009, `ERROR: ${error}`);
   }
 };
 // 3. Create post
@@ -49,14 +57,14 @@ export const createPostService = async (user, postData) => {
 
     return createdPost;
   } catch (error) {
-    throw new BadRequest(`Couldn't create post, ERROR: ${error}`);
+    throw new BadRequest(GAf_000011, `ERROR: ${error}`);
   }
 };
 // 4. Update post
 export const updatePostService = async (user, postId, updateData) => {
   try {
     const post = await Post.findOne({ _id: postId, author: user._id });
-    if (!post) throw "Post not found";
+    if (!post) throw GAf_000010;
 
     const allowedUpdates = ["title", "body"];
 
@@ -69,7 +77,7 @@ export const updatePostService = async (user, postId, updateData) => {
 
     await post.save();
   } catch (error) {
-    throw new BadRequest(`Couldn't update post, ERROR: ${error}`);
+    throw new BadRequest(GAf_000012, `ERROR: ${error}`);
   }
 };
 // 5. Delete post
@@ -80,11 +88,9 @@ export const deletePostService = async (user, postId) => {
       author: user._id,
     });
 
-    // Making sure references list is updated with each deletion
-    user.posts = user.posts.filter((postId) => deletePost._id !== postId);
-    if (!deletePost) throw "Post not found!";
+    if (!deletePost) throw GAf_000010;
   } catch (error) {
-    throw new NotFound(`Couldn't delete post, ERROR: ${error}`);
+    throw new NotFound(GAf_000013, `ERROR: ${error}`);
   }
 };
 // 6. Like post
@@ -97,6 +103,6 @@ export const likePostService = async (postId) => {
 
     return { likes: updatePost.likes };
   } catch (error) {
-    throw new BadRequest(`Couldn't like post, ERROR: ${error}`);
+    throw new BadRequest(GAf_000014, `ERROR: ${error}`);
   }
 };

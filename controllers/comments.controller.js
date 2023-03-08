@@ -2,6 +2,7 @@ import {
   createCommentService,
   getAllCommentsService,
 } from "../services/comments.service.js";
+import { GAs_000005, GAf_000005 } from "../errors/error.codes.js";
 
 // 1. Get all comments
 export const getAllComments = async (req, res, next) => {
@@ -11,7 +12,7 @@ export const getAllComments = async (req, res, next) => {
 
     res.status(200).send(comments);
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send({ message: GAf_000005 });
   }
 };
 // 2. Create a comment
@@ -27,13 +28,13 @@ export const createComment = async (req, res, next) => {
       const createdComment = await createCommentService(user, commentData);
 
       res.status(201).send({
-        message: "Comment added successfully",
+        message: GAs_000005,
         postId: createdComment.post,
       });
     } catch (error) {
       res.status(400).send(error);
     }
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send({ message: GAf_000005 });
   }
 };

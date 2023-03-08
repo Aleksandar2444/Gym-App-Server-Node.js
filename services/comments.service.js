@@ -1,6 +1,7 @@
 import { BadRequest, GeneralError } from "../errors/error.js";
 import { Comment } from "../models/comment.model.js";
 import { getPostByIdService } from "./posts.service.js";
+import { GAf_000007, GAf_000008 } from "../errors/error.codes.js";
 
 // 1. Get all comments
 export const getAllCommentsService = async () => {
@@ -8,7 +9,7 @@ export const getAllCommentsService = async () => {
     const comments = await Comment.find({});
     return comments;
   } catch (error) {
-    throw new GeneralError(`Couldn't fetch comments, ERROR: ${error}`);
+    throw new GeneralError(GAf_000007, `ERROR: ${error}`);
   }
 };
 // 2. Create a comment
@@ -27,6 +28,6 @@ export const createCommentService = async (user, commentData) => {
 
     return createdComment;
   } catch (error) {
-    throw new BadRequest(`Couldn't create comment, ERROR: ${error}`);
+    throw new BadRequest(GAf_000008, `ERROR: ${error}`);
   }
 };

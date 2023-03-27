@@ -1,10 +1,12 @@
 import { Router } from "express";
+import { authValidator } from "../middlewares/auth.middleware.js";
+
 import { authRouter } from "../routes/auth.routes.js";
 import { postsRouter } from "../routes/posts.routes.js";
 import { commentsRouter } from "../routes/comments.routes.js";
 import { usersRouter } from "../routes/users.routes.js";
-
-import { authValidator } from "../middlewares/auth.middleware.js";
+import { userInfoRouter } from "../routes/user-info.routes.js";
+import { countriesRouter } from "../routes/countries.routes.js";
 
 export const globalRouter = Router();
 
@@ -16,3 +18,7 @@ globalRouter.use("/posts", authValidator, postsRouter);
 globalRouter.use("/comments", authValidator, commentsRouter);
 // 4. User router
 globalRouter.use("/user", authValidator, usersRouter);
+// 5. User profile router
+globalRouter.use("/user-profile", authValidator, userInfoRouter);
+// 6. Countires router
+globalRouter.use("/countries", authValidator, countriesRouter);

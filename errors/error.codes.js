@@ -23,3 +23,5 @@ export const GAf_000013 = `Couldn't delete post`;
 export const GAf_000014 = `Couldn't like post`;
 export const GAf_000015 = `Couldn't get user's posts`;
 export const GAf_000016 = `Couldn't get user's comments`;
+export const GAf_000017 = `Couldn't update user profile`;
+export const GAf_000018 = `Couldn't fetch countries`;

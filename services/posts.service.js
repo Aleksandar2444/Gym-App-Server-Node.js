@@ -13,7 +13,7 @@ import { Post } from "../models/post.model.js";
 export const getAllPostsService = async () => {
   try {
     const posts = await Post.find({})
-      .populate("author", "firstName lastName")
+      .populate("author", "firstName lastName gymNickname")
       .sort({
         createdAt: "desc",
       });
@@ -27,13 +27,14 @@ export const getAllPostsService = async () => {
 export const getPostByIdService = async (postId) => {
   try {
     const findPost = await Post.findById(postId)
-      .populate("author", "firstName lastName")
+      .populate("author", "firstName lastName gymNickname")
       .populate({
         path: "comments",
         populate: {
           path: "author",
-          select: "firstName lastName",
+          select: "firstName lastName gymNickname",
         },
+        options: { sort: { createdAt: "desc" } },
       });
 
     if (!findPost) throw GAf_000010;

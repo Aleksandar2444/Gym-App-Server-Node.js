@@ -1,6 +1,7 @@
 import {
   getCommentsByUserService,
   getPostByUserService,
+  getCommentsByPostService,
 } from "../services/users.service.js";
 import { GAf_000005 } from "../errors/error.codes.js";
 
@@ -34,5 +35,22 @@ export const getCommentsByUser = async (req, res, next) => {
     }
   } catch (error) {
     res.status(500).send({ message: GAf_000005 });
+  }
+};
+// 3. Get comments by post
+export const getCommentsByPost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    console.log("c1", postId);
+
+    try {
+      const commentsByPost = await getCommentsByPostService(postId);
+      console.log("c2", commentsByPost);
+      res.status(200).send(commentsByPost);
+    } catch (error) {
+      console.log(error);
+    }
+  } catch (error) {
+    console.log(error);
   }
 };

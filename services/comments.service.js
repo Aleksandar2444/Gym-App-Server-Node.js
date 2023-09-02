@@ -6,7 +6,12 @@ import { GAf_000007, GAf_000008 } from "../errors/error.codes.js";
 // 1. Get all comments
 export const getAllCommentsService = async () => {
   try {
-    const comments = await Comment.find({});
+    const comments = await Comment.find({})
+      .populate("author", "firstName lastName gymNickname")
+      .sort({
+        createdAt: "desc",
+      });
+
     return comments;
   } catch (error) {
     throw new GeneralError(GAf_000007, `ERROR: ${error}`);

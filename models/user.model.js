@@ -5,35 +5,67 @@ import { GAf_000001, GAf_000002 } from "../errors/error.codes.js";
 
 const { Schema } = mongoose;
 
-const userSchema = new Schema({
-  firstName: {
-    type: String,
-    required: true,
-    minlength: 2,
-  },
-  lastName: {
-    type: String,
-    required: true,
-    minlength: 2,
-  },
-  email: {
-    type: String,
-    required: true,
-    validate: {
-      validator: (value) => validator.isEmail(value),
-      message: (message) => "Invalid Email",
+const userSchema = new Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+      minlength: 2,
     },
-    unique: true,
+    lastName: {
+      type: String,
+      required: true,
+      minlength: 2,
+    },
+    email: {
+      type: String,
+      required: true,
+      validate: {
+        validator: (value) => validator.isEmail(value),
+        message: (message) => "Invalid Email",
+      },
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 8,
+    },
+    resetPasswordToken: {
+      type: String,
+    },
+    posts: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Post",
+      },
+    ],
+    comments: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
+    gymNickname: {
+      type: String,
+      minlength: 2,
+      unique: true,
+    },
+    country: {
+      type: String,
+    },
+    city: {
+      type: String,
+      minlength: 2,
+    },
+    about: {
+      type: String,
+    },
   },
-  password: {
-    type: String,
-    required: true,
-    minlength: 8,
-  },
-  resetPasswordToken: {
-    type: String,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 userSchema.methods.comparePasswords = async function (loginPassword) {
   const user = this;

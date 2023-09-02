@@ -17,6 +17,7 @@ import {
   GAs_000001,
   GAs_000002,
   GAs_000003,
+  GAs_000004,
 } from "../errors/error.codes.js";
 
 const { DOMAIN_URL } = process.env;
@@ -47,7 +48,7 @@ export const loginUser = async (req, res) => {
 
       const token = createAccessToken(user._id);
 
-      res.header("Authorization", `Bearer  ${token}`);
+      res.header("Authorization", `Bearer ${token}`);
 
       return res.status(200).send({
         user: user.toJSON(),
@@ -110,7 +111,7 @@ export const forgotPassword = async (req, res) => {
 
     await nodemailerService(user, link);
 
-    res.sendStatus(200);
+    res.status(200).send({ message: GAs_000004 });
   } catch (error) {
     res.status(500).send({ message: GAf_000005 });
   }

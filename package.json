@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
@@ -13,9 +13,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "jest": "^29.5.0",
     "nodemon": "^2.0.20"
   },
   "dependencies": {
+    "@babel/preset-env": "^7.21.5",
     "axios": "^1.2.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.1",
